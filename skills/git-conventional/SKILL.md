@@ -1,57 +1,82 @@
 ---
 name: git-conventional
 description: >
-  Review, set up, and manage project versioning using Git and Conventional Commits.
-  Use when a project needs versioning audit, initial git setup with Conventional Commits
-  config, GitHub integration with gh CLI, commit hygiene validation, or release/changelog
-  generation. Triggers on: versionar, git setup, conventional commits, semantic versioning,
-  gh cli, changelog, release, tag version.
+  Teach, audit, and manage project versioning using Git, Semantic Versioning, and Conventional Commits.
+  Use when a project needs to check whether it is already versioned, initialize Git, define a versioning
+  strategy, validate commit hygiene, configure GitHub CLI, or generate changelogs and release notes.
+  Triggers on: versioning, git setup, conventional commits, semantic versioning, gh cli, changelog,
+  release, tags, commit format.
 ---
 
 # Git Conventional
 
-Set up and manage project versioning with Conventional Commits and optional GitHub CLI integration.
+Help the user understand whether a repository is already versioned, then guide them through Git setup,
+Semantic Versioning, Conventional Commits, and optional GitHub CLI integration.
 
-## Step 1 — Detect Project State
+## Operating Principles
 
-Run in order:
+- Explain the current state first in simple language.
+- Use a teaching tone for non-experts.
+- Prefer the smallest correct change.
+- Do not assume the repository is versioned until Git, tags, and version source are checked.
+- Ask before changing files, installing dependencies, or modifying CI.
+
+## Step 1 — Detect Current State
+
+Check, in order:
 
 ```bash
-git rev-parse --is-inside-work-tree 2>/dev/null   # Is it a git repo?
-git tag --list                                     # Existing tags?
-git remote -v                                      # Remotes?
-cat package.json 2>/dev/null | grep version        # Node?
-cat *.podspec 2>/dev/null | grep version           # iOS?
-grep -r "MARKETING_VERSION" *.xcodeproj/project.pbxproj 2>/dev/null  # Xcode?
-cat pyproject.toml 2>/dev/null | grep version      # Python?
-cat Cargo.toml 2>/dev/null | grep version          # Rust?
+git rev-parse --is-inside-work-tree 2>/dev/null
+git tag --list
+git remote -v
+git status --short
+git log --oneline -5 2>/dev/null
 ```
 
-Record: git repo (yes/no), tags, latest tag, remotes, version file, current version, stack.
+Then inspect the stack-specific source of truth when relevant:
 
-## Step 2 — Propose Versioning Strategy
+```bash
+cat package.json 2>/dev/null | grep version
+cat *.podspec 2>/dev/null | grep version
+grep -r "MARKETING_VERSION" *.xcodeproj/project.pbxproj 2>/dev/null
+cat pyproject.toml 2>/dev/null | grep version
+cat Cargo.toml 2>/dev/null | grep version
+```
 
-Based on state, propose to the user:
+Record whether the repo has Git, tags, a latest tag, remotes, a version source, and a current version.
 
-| Scenario | Recommendation |
-|----------|---------------|
-| No git repo | Init repo, create `.gitignore`, first commit |
-| No tags | Start at `0.1.0` or `1.0.0` based on project maturity |
-| Tags but inconsistent | Adopt SemVer from current state |
-| Node project | `package.json` version as source of truth |
-| Swift/iOS | MARKETING_VERSION in project.pbxproj |
-| Python | `pyproject.toml` version |
-| Multiple sources | Consolidate to single source |
+## Step 2 — Explain the State
 
-Always propose **Semantic Versioning** (MAJOR.MINOR.PATCH) with **Conventional Commits**.
+Classify the repository for the user:
+
+| Scenario | Meaning | Recommendation |
+|----------|---------|----------------|
+| No Git repo | Not versioned yet | Initialize Git, add `.gitignore`, create the first commit |
+| Git but no tags | Versioned, but not released | Start semantic versioning with `0.1.0` or `1.0.0` |
+| Tags but inconsistent version source | Versioning exists but is fragmented | Choose a single source of truth |
+| GitHub project | Collaboration and release flow available | Install and configure `gh` |
+| No commit conventions | History is harder to automate | Add Conventional Commits |
+
+Always propose **Semantic Versioning** (`MAJOR.MINOR.PATCH`) together with **Conventional Commits**.
+
+## Step 3 — Propose a Path
+
+When the repository is not versioned yet, suggest this sequence:
+
+1. Initialize Git.
+2. Add `.gitignore`.
+3. Make the first commit.
+4. Add tags when the project is ready to release.
+5. Install and configure `gh` if GitHub is used.
+6. Add Conventional Commits validation.
 
 Wait for user approval before making changes.
 
-## Step 3 — Conventional Commits Setup
+## Step 4 — Conventional Commits Setup
 
 Commit format:
 
-```
+```bash
 <type>(<scope>): <description>
 
 [optional body]
@@ -62,14 +87,14 @@ Commit format:
 ### Types
 
 | Type | SemVer bump | Use when |
-|------|------------|----------|
+|------|-------------|----------|
 | `feat` | MINOR | New feature |
 | `fix` | PATCH | Bug fix |
 | `docs` | none | Documentation only |
 | `style` | none | Formatting, whitespace |
 | `refactor` | none | Code restructure, no behavior change |
 | `perf` | PATCH | Performance improvement |
-| `test` | none | Adding/updating tests |
+| `test` | none | Adding or updating tests |
 | `chore` | none | Build, CI, tooling, deps |
 | `ci` | none | CI configuration |
 | `build` | none | Build system |
@@ -77,10 +102,11 @@ Commit format:
 
 ### Breaking Changes
 
-Use `!` after type/scope OR `BREAKING CHANGE:` in footer. Either bumps MAJOR.
+Use `!` after type or scope, or `BREAKING CHANGE:` in the footer. Either one bumps MAJOR.
 
 Examples:
-```
+
+```bash
 feat(auth): add OAuth2 login flow
 fix(api): handle null response from user endpoint
 feat(ui)!: redesign dashboard layout
@@ -89,7 +115,7 @@ chore(deps): update dependencies
 
 ### Git Hook
 
-Create `.githooks/commit-msg` to validate format:
+Create `.githooks/commit-msg` to validate the format:
 
 ```bash
 mkdir -p .githooks
@@ -111,7 +137,8 @@ git config core.hooksPath .githooks
 ### .gitignore Templates
 
 **Node.js:**
-```
+
+```bash
 node_modules/
 dist/
 .env
@@ -121,7 +148,8 @@ coverage/
 ```
 
 **Swift/iOS:**
-```
+
+```bash
 .build/
 xcuserdata/
 DerivedData/
@@ -131,7 +159,8 @@ Pods/
 ```
 
 **Python:**
-```
+
+```bash
 __pycache__/
 *.pyc
 .venv/
@@ -140,34 +169,34 @@ dist/
 .env
 ```
 
-## Step 4 — GitHub Integration
+## Step 5 — GitHub Integration
 
-If user uses GitHub or remotes point to `github.com`:
+If the project uses GitHub or the remote points to `github.com`:
 
 ```bash
-# Check if gh is installed
 which gh || echo "NEEDS_INSTALL"
 
-# Install gh if missing
-# macOS:
+# macOS
 brew install gh
-# Ubuntu/Debian:
+
+# Ubuntu/Debian
 sudo apt install gh
-# Fedora:
+
+# Fedora
 sudo dnf install gh
 
-# Authenticate (interactive — user must complete)
 gh auth status 2>/dev/null || echo "Run: gh auth login"
 ```
 
-After auth, `gh` enables:
-- `gh pr create` — create pull requests
-- `gh release create vX.Y.Z --generate-notes` — create releases with auto-notes
-- `gh issue create` — create issues
-- `gh pr merge` — merge PRs
-- `gh api` — direct GitHub API access
+After authentication, `gh` enables:
 
-## Step 5 — Generate Changelog
+- `gh pr create` for pull requests
+- `gh release create vX.Y.Z --generate-notes` for releases with notes
+- `gh issue create` for issues
+- `gh pr merge` for merges
+- `gh api` for direct GitHub API access
+
+## Step 6 — Generate Changelog
 
 From conventional commits:
 
@@ -175,12 +204,11 @@ From conventional commits:
 LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
 LOG_RANGE="${LAST_TAG:+$LAST_TAG..HEAD}"
 
-# Group by type
 echo "## What's New\n"
-git log $LOG_RANGE --pretty=format:"%s" | grep -E "^feat" | sed 's/^feat(\([^)]*\)):/:sparkles: (\1) /;s/^feat:/:sparkles: /' | sort
+git log $LOG_RANGE --pretty=format:"%s" | grep -E "^feat" | sort
 echo ""
 echo "## Bug Fixes\n"
-git log $LOG_RANGE --pretty=format:"%s" | grep -E "^fix" | sed 's/^fix(\([^)]*\)):/:bug: (\1) /;s/^fix:/:bug: /' | sort
+git log $LOG_RANGE --pretty=format:"%s" | grep -E "^fix" | sort
 echo ""
 git log $LOG_RANGE --pretty=format:"%s" | grep -E "BREAKING" && echo "⚠️ Breaking Changes detected"
 ```
@@ -189,14 +217,14 @@ For GitHub releases: `gh release create vX.Y.Z --generate-notes`.
 
 ## Rules
 
-- NEVER force-push to main/master without explicit user approval
-- NEVER push to remote without user approval (local commits are OK)
-- Always use Conventional Commits for commits the agent creates
-- Tag format: `vMAJOR.MINOR.PATCH` (e.g., `v1.2.3`)
-- Set up `.gitignore` before first commit
-- Ask before installing packages or modifying CI configuration
+- Never force-push to `main` or `master` without explicit user approval.
+- Never push to a remote without user approval unless the user asked for it.
+- Always use Conventional Commits for commits created by the agent.
+- Use tags in the form `vMAJOR.MINOR.PATCH`.
+- Set up `.gitignore` before the first commit.
+- Ask before installing packages or modifying CI configuration.
 
 ## Language
 
-- Match user's language
-- Technical terms keep original English when standard
+- Match the user's language.
+- Keep technical terms in English when that is the standard.
