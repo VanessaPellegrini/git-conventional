@@ -1,74 +1,78 @@
 # Git Conventional
 
-Open-source AI agent skill for **project versioning with Git and Conventional Commits**.
+Skill de agente de IA open-source para **versionar proyectos con Git y Conventional Commits**.
 
-Compatible with any agent that supports SKILL.md (OpenClaw, Claude Code, Codex, Cursor, and 50+ more).
+Compatible con cualquier agente que soporte SKILL.md (OpenClaw, Claude Code, Codex, Cursor, y más de 50 más).
 
-## Install
+## Instalar
 
 ```bash
 npx skills add VanessaPellegrini/git-conventional
 ```
 
-## What it does
+## Qué hace
 
-| Feature | Description |
-|---------|-------------|
-| Versioning audit | Review current git/tag state and propose a versioning strategy |
-| Git setup | Initialize repo with `.gitignore` and first commit |
-| Conventional Commits | Enforce commit format with git hooks |
-| GitHub CLI | Install and configure `gh` for PRs, releases, and issues |
-| Changelog generation | Auto-generate changelogs from conventional commits |
+| Funcionalidad | Descripción |
+|---------------|-------------|
+| Auditoría de versionado | Revisa el estado actual de git/tags y propone una estrategia |
+| Setup de Git | Inicializa repo con `.gitignore` y primer commit |
+| Conventional Commits | Aplica formato de commits con git hooks de validación |
+| GitHub CLI | Instala y configura `gh` para PRs, releases e issues |
+| Generación de changelog | Genera changelogs automáticos desde los commits convencionales |
 
-## Example
-
-```
-You: "I need to version this project"
-Agent: [loads git-conventional]
-Agent: "Detecting project state... Node.js project, no git repo, no tags."
-Agent: "Proposing: init git repo, start at v0.1.0, Conventional Commits with scope by module."
-```
+## Ejemplo
 
 ```
-You: "Create a release for the new auth feature"
-Agent: "Since last tag (v1.1.0), there are 3 feat and 2 fix commits."
-Agent: "Bumping to v1.2.0. Creating tag and GitHub release..."
+Vos: "Necesito versionar este proyecto"
+Agente: [carga git-conventional]
+Agente: "Detectando estado... Proyecto Node.js, sin repo git, sin tags."
+Agente: "Propongo: init git repo, empezar en v0.1.0, Conventional Commits con scope por módulo."
+```
+
+```
+Vos: "Creá un release para la nueva feature de auth"
+Agente: "Desde el último tag (v1.1.0), hay 3 feat y 2 fix commits."
+Agente: "Subiendo a v1.2.0. Creando tag y release en GitHub..."
 ```
 
 ## Conventional Commits
 
-Every commit follows this format:
+Cada commit sigue este formato:
 
 ```
-<type>(<scope>): <description>
+<tipo>(<ámbito>): <descripción>
 ```
 
-| Type | Version bump | Use when |
-|------|-------------|----------|
-| `feat` | MINOR | New feature |
-| `fix` | PATCH | Bug fix |
-| `docs` | — | Documentation only |
-| `style` | — | Formatting |
-| `refactor` | — | Code restructure |
-| `perf` | PATCH | Performance improvement |
-| `test` | — | Adding/updating tests |
-| `chore` | — | Build, CI, tooling |
-| `!` or `BREAKING CHANGE` | MAJOR | Incompatible change |
+| Tipo | Impacto en versión | Cuándo usarlo |
+|------|-------------------|---------------|
+| `feat` | MINOR | Nueva funcionalidad |
+| `fix` | PATCH | Corrección de bug |
+| `docs` | — | Solo documentación |
+| `style` | — | Formato, espacios |
+| `refactor` | — | Reestructuración de código |
+| `perf` | PATCH | Mejora de rendimiento |
+| `test` | — | Tests |
+| `chore` | — | Build, CI, herramientas |
+| `!` o `BREAKING CHANGE` | MAJOR | Cambio incompatible |
 
 ## GitHub CLI
 
-If the project uses GitHub, the skill installs `gh` and enables:
+Si el proyecto usa GitHub, la skill instala `gh` y habilita:
 
 ```bash
-gh pr create --title "feat: add search" --body "Adds search"
+gh pr create --title "feat: agregar búsqueda" --body "Agrega funcionalidad de búsqueda"
 gh release create v1.2.0 --generate-notes
-gh issue create --title "Bug: login fails on Safari"
+gh issue create --title "Bug: login falla en Safari"
 ```
 
-## Contributing
+## Contribuir
 
-Open project. Contributions welcome.
+Proyecto abierto. Contribuciones bienvenidas.
 
-## License
+## Licencia
 
 MIT
+
+---
+
+_Hecho con curiosidad por Van & Purim 🐶_
